@@ -13,6 +13,8 @@ final String tipoColumn = "tipoColumn";
 final String dataPagamentoColumn = "datapagemtoColumn";
 final String valorColumn = "valorColumn";
 final String pagoColumn = "pagoColumn";
+final String tipoPago = '"1"';
+final String tipoReceber = "0";
 
 class VendasHelper {
   static final VendasHelper _instance = VendasHelper.internal();
@@ -108,6 +110,23 @@ class VendasHelper {
     var value = result[0]["SUM($valorColumn)"]; // value = 220
     return value.toString();
     print("O TAOATAL É: " + value.toString());
+
+  }
+
+
+  Future<String> getTotalPago() async {
+    var dbVenda = await db;
+    var result = await dbVenda.rawQuery("SELECT SUM($valorColumn) as valor FROM $vendaTable WHERE $pagoColumn=?", ["1"]);
+   var value = result[0]["valor"]; // value = 220
+   return value.toString();
+
+  }
+
+  Future<String> getTotalReceber() async {
+    var dbVenda = await db;
+    var result = await dbVenda.rawQuery("SELECT SUM($valorColumn) as valor FROM $vendaTable WHERE $pagoColumn=?", ["0"]);
+    var value = result[0]["valor"]; // value = 220
+    return value.toString();
 
   }
 

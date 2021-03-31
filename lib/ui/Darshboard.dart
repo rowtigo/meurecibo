@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:meu_recibo/model/venda_helper.dart';
 import 'package:meu_recibo/ui/VendaPage.dart';
 
@@ -14,7 +16,9 @@ class _DashboardState extends State<Dashboard> {
 
   List<Venda> vendas = List();
 
-  String totalDashboard;
+  String totalDashboard="carregando..";
+  String totalPago="carregando..";
+  String totalReceber="carregando..";
 
   @override
   void initState() {
@@ -22,6 +26,8 @@ class _DashboardState extends State<Dashboard> {
 
     _getAllVendas();
     _getTotal();
+    _getTotalPago();
+    _getTotalReceber();
     // String total = _getTotal();
   }
 
@@ -29,6 +35,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         title: Text("meuRecibo - Dashboard"),
         backgroundColor: Colors.pink,
@@ -85,39 +92,54 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
       body:  Column(
-        children: [
-          Padding(padding: EdgeInsets.all(8) , child: Card(
-              color: Colors.pink,
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                      child: Icon(Icons.attach_money, color: Colors.white, size: 40),
-                    ),
 
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Total de vendas até agora:",
-                            style: TextStyle(
-                                color: Colors.white, fontSize: 15)),
-                        Text("R\$ "+totalDashboard ??" 0",
-                            style: TextStyle(
-                                color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold))
-                      ],
-                    ),
-                  ],
+        children: [
+
+          Padding(padding: EdgeInsets.all(8), child: GestureDetector(
+            onTap: (){
+              if(totalDashboard == "0.0"){
+                _msgNenhumDado();
+              }else{
+                _requestDetails();
+              }
+            },
+            child: Card(
+                color: Colors.pink,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                            child: Icon(Icons.attach_money, color: Colors.white, size: 40),
+                          ),
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Total de vendas até agora:",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 15)),
+                              Text("R\$ "+totalDashboard ??" 0",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold))
+                            ]),
+                        ]),
+
+
                 ),
-              ))),
+
+            ),
+          )),
+
+
           Padding(padding: EdgeInsets.fromLTRB(8,0,0,0) , child: Align(
             alignment: Alignment.centerLeft,
             child: Container(
               child: Text(
                   "Histórico de vendas:" ,
                   style: TextStyle(
-                      color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)
+                      color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)
               ),
             ),
           )),
@@ -218,6 +240,8 @@ class _DashboardState extends State<Dashboard> {
                               Navigator.pop(context);
                             });
                             _getTotal();
+                            _getTotalReceber();
+                            _getTotalPago();
                           },
                         ),
                       ],),
@@ -247,6 +271,8 @@ class _DashboardState extends State<Dashboard> {
         await helper.saveVenda(recVenda);
       }
       _getTotal();
+      _getTotalPago();
+      _getTotalReceber();
       _getAllVendas();
     }
   }
@@ -258,6 +284,8 @@ class _DashboardState extends State<Dashboard> {
       });
     });
   }
+
+
   void _getTotal() {
     helper.getTotalVendas().then((string) {
       setState(() {
@@ -269,6 +297,95 @@ class _DashboardState extends State<Dashboard> {
       });
     });
   }
+
+  void _getTotalPago() {
+    helper.getTotalPago().then((string) {
+      setState(() {
+        if(string != "null") {
+          totalPago = string;
+        } else{
+          totalPago = "0.0";
+        }
+      });
+    });
+  }
+  void _getTotalReceber() {
+    helper..getTotalReceber().then((string) {
+      setState(() {
+        if(string != "null") {
+          totalReceber = string;
+        } else{
+          totalReceber = "0.0";
+        }
+      });
+    });
+  }
+
+  Future<bool>_requestDetails(){
+
+      showDialog(context: context,
+          builder: (context){
+            return CupertinoAlertDialog(
+              title: Text("Extrato"),
+              content: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Total pago: "),
+                      Text("Total a receber: "),
+                      Text("Total: ", style: TextStyle(fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(totalPago??"Pago"),
+                      Text(totalReceber??"Receber"),
+                      Text(totalDashboard??"Tudo", style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: Text("Ok"),
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                ),
+
+              ],
+            );
+          }
+      );
+      return Future.value(true);
+  }
+
+  Future<bool>_msgNenhumDado(){
+
+    showDialog(context: context,
+        builder: (context){
+          return CupertinoAlertDialog(
+            title: Text("Não há vendas para gerar extrato"),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: Text("Ok"),
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+              ),
+
+            ],
+          );
+        }
+    );
+    return Future.value(true);
+  }
+
 }
 
 

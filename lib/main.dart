@@ -13,6 +13,7 @@ void main() {
     theme: ThemeData(
       accentColor: Colors.pinkAccent[400],
       primaryColor: Colors.pink,
+
     ),
   ));
 }
