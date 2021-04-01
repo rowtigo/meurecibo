@@ -30,6 +30,7 @@ class _VendaPageState extends State<VendaPage> {
   bool _marcadopago = false;
 
   Venda _editedVenda;
+  var estaMarcadoPago = Text("Pago", style: (TextStyle(color: Colors.white)),);
 
   @override
   void initState() {
@@ -57,6 +58,7 @@ class _VendaPageState extends State<VendaPage> {
     }
     if(_pagoController.text == "1"){
       _marcadopago =true;
+      estaMarcadoPago =   Text("Pago", style: (TextStyle(color: Colors.white, fontWeight: FontWeight.bold)));
     };
   }
 
@@ -196,9 +198,11 @@ class _VendaPageState extends State<VendaPage> {
                     prefix: Text("R\$ ")),
               ),
               CheckboxListTile(
-                title: Text("Pago"),
+                title: estaMarcadoPago ,
+
                 value: _marcadopago,
                 selected: _marcadopago,
+                activeColor: Colors.pink,
                 onChanged: alteraPago,
                 controlAffinity:
                     ListTileControlAffinity.leading, //  <-- leading Checkbox
@@ -289,12 +293,15 @@ class _VendaPageState extends State<VendaPage> {
   }
 
   void alteraPago(bool newValue) => setState(() {
+    _userEdited = true;
         if (_marcadopago == false) {
           _marcadopago = true;
+        estaMarcadoPago =   Text("Pago", style: (TextStyle(color: Colors.white, fontWeight: FontWeight.bold)));
           _editedVenda.pago = "1";
           _pagoController.text = "1";
         } else {
           _marcadopago = false;
+          estaMarcadoPago = Text("Pago", style: (TextStyle(color: Colors.white)),);
           _pagoController.text = "0";
           _editedVenda.pago = "0";
         }
