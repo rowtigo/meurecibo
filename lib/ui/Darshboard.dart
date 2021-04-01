@@ -19,6 +19,9 @@ class _DashboardState extends State<Dashboard> {
   String totalDashboard="carregando..";
   String totalPago="carregando..";
   String totalReceber="carregando..";
+  String msgSaldo = "Total de vendas: ";
+  var saldoIcon = Icons.visibility_off;
+  bool saldoVisivel = true;
 
   @override
   void initState() {
@@ -109,20 +112,27 @@ class _DashboardState extends State<Dashboard> {
                   padding: EdgeInsets.all(8.0),
                   child: Row(
                         children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                            child: Icon(Icons.attach_money, color: Colors.white, size: 40),
+                          GestureDetector(
+                            onTap: _alteraVisiblidadeSalso,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                              child: Icon(saldoIcon, color: Colors.white, size: 40),
+                            ),
                           ),
 
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Total de vendas até agora:",
+                              Text(msgSaldo,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 15)),
-                              Text("R\$ "+totalDashboard ??" 0",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold))
+                              Visibility(
+                                visible: saldoVisivel,
+                                child: Text("R\$ "+totalDashboard ??" 0",
+
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                              )
                             ]),
                         ]),
 
@@ -139,7 +149,7 @@ class _DashboardState extends State<Dashboard> {
               child: Text(
                   "Histórico de vendas:" ,
                   style: TextStyle(
-                      color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)
+                      color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)
               ),
             ),
           )),
@@ -160,21 +170,26 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget _vendaCard(BuildContext context, int index){
-    var cor = Colors.redAccent;
+    var cor = Colors.white38;
+    var icon = Icons.shopping_bag_outlined;
     if(vendas[index].pago == "0"){
-      cor = Colors.redAccent;
+       cor = Colors.deepOrange[100];
+       icon = Icons.shopping_bag_rounded;
     } else{
-      cor = Colors.greenAccent;
+       cor = Colors.lightGreen[100];
     }
     return GestureDetector(
 
       child: Card(
+
         color: cor,
         child: Padding(
           padding: EdgeInsets.all(8.0),
           child: Row(
             children: [
-              Icon(Icons.attach_money, size: 40),
+              Padding(padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+              child: Icon(icon, size: 40) ,),
+
               Flexible(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -386,6 +401,26 @@ class _DashboardState extends State<Dashboard> {
     return Future.value(true);
   }
 
+
+  void _alteraVisiblidadeSalso() {
+    if(saldoVisivel == true){
+      setState(
+          (){
+            saldoIcon = Icons.visibility_off;
+            saldoVisivel = false;
+            msgSaldo = "O total está culto";
+          }
+      );
+    } else {
+      setState(
+              (){
+                saldoIcon = Icons.monetization_on;
+            saldoVisivel = true;
+            msgSaldo = "Total de vendas: ";
+          }
+      );
+    }
+  }
 }
 
 
